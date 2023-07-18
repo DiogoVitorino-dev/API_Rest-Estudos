@@ -1,13 +1,11 @@
 import Express from 'express';
+import 'dotenv/config';
+import { router } from './routes';
 
 const server = Express();
 
-interface teste {
+server.use(Express.json());
 
-}
-
-server.get('/',(req,res) => {
-	return res.send('ola');
-});
+server.use(router);
 
 export {server};
