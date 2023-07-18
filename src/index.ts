@@ -1,3 +1,3 @@
-import { server } from "./server/server";
+import { server } from './server/server';
 
-server.listen(3333, () => console.log('App funcionando'))
+server.listen(3333, () => console.log('App funcionando'));

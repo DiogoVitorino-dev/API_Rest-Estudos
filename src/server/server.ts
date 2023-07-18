@@ -1,9 +1,13 @@
-import Express from "express";
+import Express from 'express';
 
-const server = Express()
+const server = Express();
+
+interface teste {
+
+}
 
 server.get('/',(req,res) => {
-    return res.send('ola')
-})
+	return res.send('ola');
+});
 
-export {server}
+export {server};
