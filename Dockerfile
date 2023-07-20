@@ -1,6 +1,6 @@
 FROM node:16.19.0
-WORKDIR /API_Rest-Estudos
+WORKDIR .
 COPY . .
 RUN npm install
-CMD ["node", "src/index.js"]
+CMD ["node", "build/index.js"]
 EXPOSE 3000
