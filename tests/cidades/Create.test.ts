@@ -31,5 +31,16 @@ describe('Cidades - Create', () => {
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
 			.toHaveProperty('errors.body.nome','Formato digitado é invalido');
+	});
+	
+	it('Não deve criar registro com a propriedade nome possuindo número de caracteres maior que 150',async () => {
+		const overflow = '012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789.';
+
+		const resCreate =  await testServer.post('/cidades')
+			.send({ nome: overflow });	
+
+		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+		expect(resCreate.body)
+			.toHaveProperty('errors.body.nome','Deve ter no máximo 150 caracteres');
 	});		
 });

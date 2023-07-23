@@ -6,8 +6,8 @@ export async function up(knex: Knex) {
 	return knex
 		.schema
 		.createTable(ETableNames.cidade,table => {
-			table.bigIncrements('cidade_id').primary().index();
-			table.string('nome',150).index().notNullable();
+			table.bigIncrements('id').primary().index();
+			table.string('nome',150).checkLength('<=',150).index().notNullable();
 			table.comment('Tabela usada para armazenar cidades');
 		}).then(() => {
 			console.log(`# create table ${ETableNames.cidade}`);			

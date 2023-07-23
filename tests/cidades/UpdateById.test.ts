@@ -2,17 +2,22 @@ import { StatusCodes } from 'http-status-codes';
 import { testServer } from '../jest.setup';
 
 describe('Cidades - UpdateById', () => {
+	
 	it('Modificar um registro',async () => {	
 		const resultCreated =  await testServer.post('/cidades').send({nome:'paulista'});
 		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
 
-		const resUpdateById =  await testServer.put(`/cidades/${resultCreated.body}`).send({ nome: 'paulista' });
-		expect(resUpdateById.statusCode).toEqual(StatusCodes.NO_CONTENT);			
+		const resUpdateById =  await testServer.put(`/cidades/${resultCreated.body}`).send({ nome: 'são paulo' });
+		expect(resUpdateById.statusCode).toEqual(StatusCodes.NO_CONTENT);
+		
+		const resGetById =  await testServer.get(`/cidades/${resultCreated.body}`);
+		expect(resGetById.body).toHaveProperty('nome','são paulo');		
 	});
 
 	it('Tentar modificar uma cidade que não existe',async () => {		
 		const resUpdateById =  await testServer.put('/cidades/99999').send({ nome: 'paulista' });
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
+		
 		expect(resUpdateById.body).toHaveProperty('errors.default');
 	});
 
@@ -34,15 +39,26 @@ describe('Cidades - UpdateById', () => {
 	});	
 	
 	it('Não deve modificar o registro com tipo da propriedade nome diferente de String',async () => {
-		const resultShouldThrowError =  await testServer.put('/cidades/1')
+		const resUpdateById =  await testServer.put('/cidades/1')
 			.send({ nome: {cidade:'paulista'} });	
 
-		expect(resultShouldThrowError.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-		expect(resultShouldThrowError.body)
+		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+		expect(resUpdateById.body)
 			.toHaveProperty('errors.body.nome','Formato digitado é invalido');
 	});
+
+	it('Não deve criar registro com a propriedade nome possuindo número de caracteres maior que 150',async () => {
+		const overflow = '012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789.';
+
+		const resCreate =  await testServer.put('/cidades/1')
+			.send({ nome: overflow });	
+
+		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+		expect(resCreate.body)
+			.toHaveProperty('errors.body.nome','Deve ter no máximo 150 caracteres');
+	});	
 	
-	// param id
+	// param id	
 	it('Parâmetro id deve ser um Number',async () => {		
 		const resUpdateById = await testServer.put('/cidades/test').send({ nome: 'paulista' });
 

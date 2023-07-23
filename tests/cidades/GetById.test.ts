@@ -11,7 +11,7 @@ describe('Cidades - GetById', () => {
 		expect(resGetById.body).toHaveProperty('nome');	
 	});
 
-	it('Tentar retorna uma cidade que não existe',async () => {		
+	it('Tenta retornar uma cidade que não existe',async () => {		
 		const resGetById =  await testServer.get('/cidades/99999');
 		expect(resGetById.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
 		expect(resGetById.body).toHaveProperty('errors.default');

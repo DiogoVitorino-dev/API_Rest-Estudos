@@ -8,6 +8,10 @@ describe('Cidades - DeleteById', () => {
 		
 		const resDeleted =  await testServer.delete(`/cidades/${resultCreated.body}`);
 		expect(resDeleted.statusCode).toEqual(StatusCodes.NO_CONTENT);
+		
+		const resGetById =  await testServer.get(`/cidades/${resultCreated.body}`);
+		expect(resGetById.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
+		expect(resGetById.body).not.toHaveProperty('nome','paulista');
 	});
 	
 	it('Tentar apagar uma cidade que não existe',async () => {		
