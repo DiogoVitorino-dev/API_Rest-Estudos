@@ -1,8 +1,13 @@
 FROM node:16.19.0
-WORKDIR /
-COPY . .
-RUN npm install
-RUN npx tsc
+ARG NODE_ENV=development
+ENV NODE_ENV $NODE_ENV
+
+COPY ./src /src
+COPY ./package.json /package.json
+COPY ./package-lock.json /package-lock.json
+COPY ./tsconfig.json /tsconfig.json
+
+RUN NODE_ENV=$NODE_ENV npm install
 RUN npm run knex:migrate
+
 CMD ["node", "build/index.js"]
-EXPOSE 3333
