@@ -9,5 +9,5 @@ COPY ./tsconfig.json /tsconfig.json
 
 RUN NODE_ENV=$NODE_ENV npm install
 RUN npm run knex:migrate
-
 CMD ["node", "build/index.js"]
+EXPOSE 3333
