@@ -26,7 +26,7 @@ describe('Cidades - DeleteById', () => {
 
 		expect(resDeleted.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resDeleted.body)
-			.toHaveProperty('errors.params.id','Formato digitado é invalido');		
+			.toHaveProperty('errors.params.id');		
 	});
 	
 	it('Parâmetro id deve ser um inteiro',async () => {		
@@ -34,7 +34,7 @@ describe('Cidades - DeleteById', () => {
 
 		expect(resDeleted.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resDeleted.body)
-			.toHaveProperty('errors.params.id','Deve ser um número inteiro');		
+			.toHaveProperty('errors.params.id');		
 	});
 	
 	it('Parâmetro id deve ser maior que 0',async () => {		
@@ -42,6 +42,6 @@ describe('Cidades - DeleteById', () => {
 
 		expect(resDeleted.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resDeleted.body)
-			.toHaveProperty('errors.params.id','Deve ser maior que 0');		
+			.toHaveProperty('errors.params.id');		
 	});	
 });

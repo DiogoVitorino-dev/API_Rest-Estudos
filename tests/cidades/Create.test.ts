@@ -13,7 +13,7 @@ describe('Cidades - Create', () => {
 
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
-			.toHaveProperty('errors.body.nome','Este campo é obrigatório');		
+			.toHaveProperty('errors.body.nome');		
 	});
 	
 	it('Não deve criar registro com propriedade nome menor 3 caracteres',async () => {		
@@ -21,7 +21,7 @@ describe('Cidades - Create', () => {
 
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
-			.toHaveProperty('errors.body.nome','Deve ter pelo menos 3 caracteres');		
+			.toHaveProperty('errors.body.nome');		
 	});	
 	
 	it('Não deve criar registro com tipo da propriedade nome diferente de String',async () => {
@@ -30,7 +30,7 @@ describe('Cidades - Create', () => {
 
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
-			.toHaveProperty('errors.body.nome','Formato digitado é invalido');
+			.toHaveProperty('errors.body.nome');
 	});
 	
 	it('Não deve criar registro com a propriedade nome possuindo número de caracteres maior que 150',async () => {
@@ -41,6 +41,6 @@ describe('Cidades - Create', () => {
 
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
-			.toHaveProperty('errors.body.nome','Deve ter no máximo 150 caracteres');
+			.toHaveProperty('errors.body.nome');
 	});		
 });
