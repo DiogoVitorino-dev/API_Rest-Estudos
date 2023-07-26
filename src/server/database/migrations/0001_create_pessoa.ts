@@ -9,7 +9,7 @@ export async function up(knex: Knex) {
 			table.bigIncrements('id').primary().index();
 			table.string('nomeCompleto',80).checkLength('<=',80).index().notNullable();
 			table.string('email',255).checkLength('<=',255).unique().notNullable();
-			
+
 			table
 				.bigInteger('cidadeid')
 				.index()
@@ -21,7 +21,7 @@ export async function up(knex: Knex) {
 
 			table.comment('Tabela usada para armazenar pessoas');
 		}).then(() => {
-			console.log(`# create table ${ETableNames.pessoa}`);			
+			console.log(`# create table ${ETableNames.pessoa}`);
 		});
 }
 
@@ -29,7 +29,7 @@ export async function up(knex: Knex) {
 export async function down(knex: Knex) {
 	return knex.schema.dropTable(ETableNames.pessoa)
 		.then(() => {
-			console.log(`# dropped table ${ETableNames.pessoa}`);			
+			console.log(`# dropped table ${ETableNames.pessoa}`);
 		});
 }
 

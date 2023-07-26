@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { CidadesController, PessoaController } from '../controllers';
+import { CidadesController, PessoasController, UsuariosController } from '../controllers';
 
 const router = Router();
 
@@ -13,10 +13,13 @@ router.post('/cidades',CidadesController.createValidation, CidadesController.cre
 router.put('/cidades/:id',CidadesController.updateByIdValidation, CidadesController.updateById);
 router.delete('/cidades/:id',CidadesController.deleteByIdValidation, CidadesController.deleteById);
 
-router.get('/pessoas',PessoaController.getAllValidation, PessoaController.getAll);
-router.get('/pessoas/:id',PessoaController.getByIdValidation, PessoaController.getById);
-router.post('/pessoas',PessoaController.createValidation, PessoaController.create);
-router.put('/pessoas/:id',PessoaController.updateByIdValidation, PessoaController.updateById);
-router.delete('/pessoas/:id',PessoaController.deleteByIdValidation, PessoaController.deleteById);
+router.get('/pessoas',PessoasController.getAllValidation, PessoasController.getAll);
+router.get('/pessoas/:id',PessoasController.getByIdValidation, PessoasController.getById);
+router.post('/pessoas',PessoasController.createValidation, PessoasController.create);
+router.put('/pessoas/:id',PessoasController.updateByIdValidation, PessoasController.updateById);
+router.delete('/pessoas/:id',PessoasController.deleteByIdValidation, PessoasController.deleteById);
+
+router.post('/entrar',UsuariosController.signInValidation, UsuariosController.signIn);
+router.post('/cadastrar',UsuariosController.signUpValidation, UsuariosController.signUp);
 
 export {router};
