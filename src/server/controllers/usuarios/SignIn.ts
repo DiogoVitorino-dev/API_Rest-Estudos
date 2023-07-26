@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import { StatusCodes } from 'http-status-codes';
 import { UsuariosProvider } from '../../database/providers/usuarios';
 import { IUsuario } from '../../database/models';
+import { PasswordCrypto } from '../../shared/services';
 
 interface IParamProps extends Omit<IUsuario,'id'|'nome'> {}
 
@@ -25,7 +26,7 @@ export const signIn = async (req: Request<{}, {}, IParamProps>, res: Response) =
 			}
 		});
 
-	if (result.senha !== senha)
+	if (!(await PasswordCrypto.verifyPassword(senha,result.senha)))
 		return res.status(StatusCodes.UNAUTHORIZED).json({
 			errors:{
 				default: 'Email ou senha são inválidos'
