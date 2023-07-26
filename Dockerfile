@@ -2,6 +2,9 @@ FROM node:16.19.0
 ARG NODE_ENV=development
 ENV NODE_ENV $NODE_ENV
 
+ARG IS_LOCALHOST=false
+ENV IS_LOCALHOST $IS_LOCALHOST
+
 COPY ./src /src
 COPY ./package.json /package.json
 COPY ./package-lock.json /package-lock.json

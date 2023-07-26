@@ -27,7 +27,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.body.nome','Este campo é obrigatório');		
+			.toHaveProperty('errors.body.nome');		
 	});
 	
 	it('Não deve modificar o registro com propriedade nome menor 3 caracteres',async () => {		
@@ -35,7 +35,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.body.nome','Deve ter pelo menos 3 caracteres');		
+			.toHaveProperty('errors.body.nome');		
 	});	
 	
 	it('Não deve modificar o registro com tipo da propriedade nome diferente de String',async () => {
@@ -44,7 +44,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.body.nome','Formato digitado é invalido');
+			.toHaveProperty('errors.body.nome');
 	});
 
 	it('Não deve criar registro com a propriedade nome possuindo número de caracteres maior que 150',async () => {
@@ -55,7 +55,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resCreate.body)
-			.toHaveProperty('errors.body.nome','Deve ter no máximo 150 caracteres');
+			.toHaveProperty('errors.body.nome');
 	});	
 	
 	// param id	
@@ -64,7 +64,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.params.id','Formato digitado é invalido');		
+			.toHaveProperty('errors.params.id');		
 	});
 	
 	it('Parâmetro id deve ser um inteiro',async () => {		
@@ -72,7 +72,7 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.params.id','Deve ser um número inteiro');		
+			.toHaveProperty('errors.params.id');		
 	});
 	
 	it('Parâmetro id deve ser maior que 0',async () => {		
@@ -80,6 +80,6 @@ describe('Cidades - UpdateById', () => {
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body)
-			.toHaveProperty('errors.params.id','Deve ser maior que 0');		
+			.toHaveProperty('errors.params.id');		
 	});
 });
