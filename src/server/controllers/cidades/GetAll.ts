@@ -29,9 +29,6 @@ export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Respons
 		Number(req.query.id),
 	);
 
-	console.log('id',req.headers.idUsuario);
-
-
 	const count = await CidadesProvider.count(req.query.filter);
 
 	if (result instanceof Error)

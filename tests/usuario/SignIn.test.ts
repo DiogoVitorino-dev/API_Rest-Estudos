@@ -18,8 +18,7 @@ describe('Usuarios - SignIn', () => {
 
 	it('Deve fazer login',async () => {
 		const resSignIn =  await testServer.post('/entrar').send(usuarioTest);
-		console.log(resSignIn.body);
-
+		
 		expect(resSignIn.statusCode).toEqual(StatusCodes.OK);
 		expect(resSignIn.body).toHaveProperty('accessToken');
 	});
