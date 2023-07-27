@@ -5,6 +5,9 @@ ENV NODE_ENV $NODE_ENV
 ARG IS_LOCALHOST=false
 ENV IS_LOCALHOST $IS_LOCALHOST
 
+ARG JWT_SECRET
+ENV JWT_SECRET $JWT_SECRET
+
 COPY ./src /src
 COPY ./package.json /package.json
 COPY ./package-lock.json /package-lock.json
