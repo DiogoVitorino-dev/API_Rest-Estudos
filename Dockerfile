@@ -13,5 +13,5 @@ COPY ./tsconfig.json /tsconfig.json
 RUN NODE_ENV=$NODE_ENV npm install
 RUN npm run knex:migrate
 RUN npm run knex:seed
-CMD ["node", "build/index.js"]
+CMD ["node","./build/index.js"]
 EXPOSE 3333

@@ -1,0 +1,33 @@
+FROM node:16.19.0
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
+
+ARG JWT_SECRET
+ENV JWT_SECRET $JWT_SECRET
+
+ARG DATABASE_HOST
+ENV DATABASE_HOST $DATABASE_HOST
+
+ARG DATABASE_USER
+ENV DATABASE_USER $DATABASE_USER
+
+ARG DATABASE_PASSWORD
+ENV DATABASE_PASSWORD $DATABASE_PASSWORD
+
+ARG DATABASE_NAME
+ENV DATABASE_NAME $DATABASE_NAME
+
+ARG DATABASE_PORT
+ENV DATABASE_PORT $DATABASE_PORT
+
+COPY ./src /src
+COPY ./package.json /package.json
+COPY ./package-lock.json /package-lock.json
+COPY ./tsconfig.json /tsconfig.json
+
+RUN NODE_ENV=$NODE_ENV npm install --include=dev
+RUN npm run preproduction
+RUN npm run knex:migrate
+RUN npm run knex:seed
+CMD ["node","./build/index.js"]
+EXPOSE 3333
