@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node-dev --respawn --transpile-only src/index.ts",
-    "postinstall": "npx tsc --project tsconfig.json",
+    "preproduction": "npx tsc --project tsconfig.json",
     "production": "node ./build/index.js",
     "test": "jest --watch",
     "knex:migrate": "npx knex --knexfile ./src/server/database/knex/Environment.ts migrate:latest",
