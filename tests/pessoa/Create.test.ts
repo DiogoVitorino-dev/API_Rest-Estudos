@@ -11,8 +11,19 @@ describe('Pessoas - Create', () => {
 	let bodyTest:IBodyTest = {};
 	let cidadeid = 1;
 
+	let accessToken = '';
+
 	beforeAll(async () => {
-		const resPost = await testServer.post('/cidades').send({ nome: 'paulista' });
+		await testServer.post('/cadastrar')
+			.send({nome:'test', email:'gettoken@outlook.com', senha:'123456'});
+
+		const {body} = await testServer.post('/entrar')
+			.send({email:'gettoken@outlook.com', senha:'123456'});
+
+		accessToken = body.accessToken;
+
+		const resPost = await testServer.post('/cidades')
+			.set({Authorization: `Bearer ${accessToken}`}).send({ nome: 'paulista' });
 		cidadeid = resPost.body;
 	});
 
@@ -25,29 +36,34 @@ describe('Pessoas - Create', () => {
 	});
 
 	it('Cria registro',async () => {
-		const resCreate =  await testServer.post('/pessoas').send(bodyTest);
+		const resCreate =  await testServer.post('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 		expect(resCreate.statusCode).toEqual(StatusCodes.CREATED);
 		expect(typeof resCreate.body).toEqual('number');
 
-		const resGetById =  await testServer.get(`/pessoas/${resCreate.body}`);
+		const resGetById =  await testServer.get(`/pessoas/${resCreate.body}`)
+			.set({Authorization: `Bearer ${accessToken}`});
 		expect(resGetById.statusCode).toEqual(StatusCodes.OK);
 		expect(resGetById.body).toHaveProperty('nomeCompleto','teste da silva');
 	});
 
 	it('Não deve cria registro com email ja cadastrado',async () => {
 		const resCreate =  await testServer.post('/pessoas')
-			.send({...bodyTest, email:'duplicado@test.com'});
+
+			.set({Authorization: `Bearer ${accessToken}`}).send({...bodyTest, email:'duplicado@test.com'});
 		expect(resCreate.statusCode).toEqual(StatusCodes.CREATED);
 
 		const resCreateDuplicado =  await testServer.post('/pessoas')
-			.send({...bodyTest, email:'duplicado@test.com'});
+
+			.set({Authorization: `Bearer ${accessToken}`}).send({...bodyTest, email:'duplicado@test.com'});
 		expect(resCreateDuplicado.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
 		expect(resCreateDuplicado.body).toHaveProperty('errors.default');
 	});
 
 	it('Não deve criar registro sem as propriedades nomeCompleto, email, cidadeid',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.nomeCompleto');
@@ -60,7 +76,8 @@ describe('Pessoas - Create', () => {
 			bodyTest.nomeCompleto = '';
 			for (let count = 1; count <= 81; count++)	bodyTest.nomeCompleto += 0;
 
-			const resCreate =  await testServer.post('/pessoas').send(bodyTest);
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.nomeCompleto');
@@ -69,7 +86,8 @@ describe('Pessoas - Create', () => {
 	it('Não deve criar registro com propriedade nomeCompleto menor 3 caracteres',
 		async () => {
 			bodyTest.nomeCompleto = '12';
-			const resCreate =  await testServer.post('/pessoas').send(bodyTest);
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.nomeCompleto');
@@ -80,7 +98,8 @@ describe('Pessoas - Create', () => {
 			bodyTest.email = '';
 			for (let count = 1; count <= 256; count++) bodyTest.email += 0;
 
-			const resCreate =  await testServer.post('/pessoas').send(bodyTest);
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body)
@@ -90,7 +109,8 @@ describe('Pessoas - Create', () => {
 	it('Não deve modificar o registro com a propriedade email com formato inválido',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
-				.send({...bodyTest, email:'asasdwadqwasasasaxz.com'});
+
+				.set({Authorization: `Bearer ${accessToken}`}).send({...bodyTest, email:'asasdwadqwasasasaxz.com'});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resUpdateById.body).toHaveProperty('errors.body.email');
@@ -98,11 +118,12 @@ describe('Pessoas - Create', () => {
 
 	it('Não deve criar registro com tipo das propriedades nomeCompleto, email diferente de String',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({
-				...bodyTest,
-				nomeCompleto:{},
-				email:{}
-			});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({
+					...bodyTest,
+					nomeCompleto:{},
+					email:{}
+				});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.nomeCompleto');
@@ -111,10 +132,11 @@ describe('Pessoas - Create', () => {
 
 	it('Não deve criar registro com tipo da propriedade cidadeid diferente de number',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({
-				...bodyTest,
-				cidadeid:'test'
-			});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({
+					...bodyTest,
+					cidadeid:'test'
+				});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.cidadeid');
@@ -122,10 +144,11 @@ describe('Pessoas - Create', () => {
 
 	it('Não deve criar registro com propriedade cidadeid diferente de numero inteiro',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({
-				...bodyTest,
-				cidadeid:1.5
-			});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({
+					...bodyTest,
+					cidadeid:1.5
+				});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.cidadeid');
@@ -133,10 +156,11 @@ describe('Pessoas - Create', () => {
 
 	it('Não deve criar registro com propriedade cidadeid menor que 1',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({
-				...bodyTest,
-				cidadeid: -1
-			});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({
+					...bodyTest,
+					cidadeid: -1
+				});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.cidadeid');
@@ -144,10 +168,11 @@ describe('Pessoas - Create', () => {
 
 	it('Não deve criar registro com o valor da propriedade cidadeid não seja encontrada no banco',
 		async () => {
-			const resCreate =  await testServer.post('/pessoas').send({
-				...bodyTest,
-				cidadeid: 9989898
-			});
+			const resCreate =  await testServer.post('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).send({
+					...bodyTest,
+					cidadeid: 9989898
+				});
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
 		});

@@ -11,8 +11,18 @@ describe('Pessoas - UpdateById', () => {
 	let bodyTest:IBodyTest = {};
 	let cidadeid = 1;
 
+	let accessToken = '';
 	beforeAll(async () => {
-		const resPost = await testServer.post('/cidades').send({ nome: 'paulista' });
+		await testServer.post('/cadastrar')
+			.send({nome:'test', email:'gettoken@outlook.com', senha:'123456'});
+
+		const {body} = await testServer.post('/entrar')
+			.send({email:'gettoken@outlook.com', senha:'123456'});
+
+		accessToken = body.accessToken;
+
+		const resPost = await testServer.post('/cidades')
+			.set({Authorization: `Bearer ${accessToken}`}).send({ nome: 'paulista' });
 		cidadeid = resPost.body;
 	});
 
@@ -25,19 +35,23 @@ describe('Pessoas - UpdateById', () => {
 	});
 
 	it('Modificar um registro',async () => {
-		const resultCreated =  await testServer.post('/pessoas').send(bodyTest);
+		const resultCreated =  await testServer.post('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
 
 		const resUpdateById =  await testServer.put(`/pessoas/${resultCreated.body}`)
+			.set({Authorization: `Bearer ${accessToken}`})
 			.send({...bodyTest, nomeCompleto: 'test' });
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.NO_CONTENT);
 
-		const resGetById =  await testServer.get(`/pessoas/${resultCreated.body}`);
+		const resGetById =  await testServer.get(`/pessoas/${resultCreated.body}`)
+			.set({Authorization: `Bearer ${accessToken}`});
 		expect(resGetById.body).toHaveProperty('nomeCompleto','test');
 	});
 
 	it('Tentar modificar um registro que não existe',async () => {
 		const resUpdateById =  await testServer.put('/pessoas/99999')
+			.set({Authorization: `Bearer ${accessToken}`})
 			.send({...bodyTest, nomeCompleto: 'test' });
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -47,7 +61,8 @@ describe('Pessoas - UpdateById', () => {
 	// body
 	it('Não deve modificar o registro sem a propriedade nomeCompleto, email, cidadeid',
 		async () => {
-			const resUpdateById =  await testServer.put('/pessoas/1').send({});
+			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`}).send({});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resUpdateById.body).toHaveProperty('errors.body.nomeCompleto');
@@ -58,6 +73,7 @@ describe('Pessoas - UpdateById', () => {
 	it('Não deve modificar o registro com propriedade nomeCompleto menor 3 caracteres',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, nomeCompleto:'12' });
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -67,6 +83,7 @@ describe('Pessoas - UpdateById', () => {
 	it('Não deve modificar o registro com tipo das propriedades nomeCompleto, email diferente de String',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, nomeCompleto:{}, email:{}});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -77,12 +94,14 @@ describe('Pessoas - UpdateById', () => {
 	it('Não deve modificar o registro com tipo da propriedade cidadeid diferente de number e numero inteiro',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, cidadeid:'test'});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resUpdateById.body).toHaveProperty('errors.body.cidadeid');
 
 			const resIntegerUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, cidadeid:1.5});
 
 			expect(resIntegerUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -92,6 +111,7 @@ describe('Pessoas - UpdateById', () => {
 	it('Não deve modificar o registro com tipo da propriedade cidadeid menor 1',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, cidadeid: -1});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -101,6 +121,7 @@ describe('Pessoas - UpdateById', () => {
 	it('Não deve modificar o registro com a propriedade email com formato inválido',
 		async () => {
 			const resUpdateById =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`})
 				.send({...bodyTest, email:'asasdwadqwasasasaxz.com'});
 
 			expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -112,7 +133,8 @@ describe('Pessoas - UpdateById', () => {
 			bodyTest.email = '';
 			for (let count = 1; count <= 256; count++) bodyTest.email += 0;
 
-			const resCreate =  await testServer.put('/pessoas/1').send(bodyTest);
+			const resCreate =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.email');
@@ -123,7 +145,8 @@ describe('Pessoas - UpdateById', () => {
 			bodyTest.nomeCompleto = '';
 			for (let count = 1; count <= 81; count++)	bodyTest.nomeCompleto += 0;
 
-			const resCreate =  await testServer.put('/pessoas/1').send(bodyTest);
+			const resCreate =  await testServer.put('/pessoas/1')
+				.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 			expect(resCreate.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 			expect(resCreate.body).toHaveProperty('errors.body.nomeCompleto');
@@ -131,21 +154,24 @@ describe('Pessoas - UpdateById', () => {
 
 	// param id
 	it('Parâmetro id deve ser um Number',async () => {
-		const resUpdateById = await testServer.put('/pessoas/test').send(bodyTest);
+		const resUpdateById = await testServer.put('/pessoas/test')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body).toHaveProperty('errors.params.id');
 	});
 
 	it('Parâmetro id deve ser um inteiro',async () => {
-		const resUpdateById =  await testServer.put('/pessoas/1.2').send(bodyTest);
+		const resUpdateById =  await testServer.put('/pessoas/1.2')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body).toHaveProperty('errors.params.id');
 	});
 
 	it('Parâmetro id deve ser maior que 0',async () => {
-		const resUpdateById =  await testServer.put('/pessoas/0').send(bodyTest);
+		const resUpdateById =  await testServer.put('/pessoas/0')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
 
 		expect(resUpdateById.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resUpdateById.body).toHaveProperty('errors.params.id');
