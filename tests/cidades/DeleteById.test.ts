@@ -25,6 +25,15 @@ describe('Cidades - DeleteById', () => {
 		expect(resGetById.body).not.toHaveProperty('nome','paulista');
 	});
 
+	it('Não deve apagar uma cidade sem o token de validação na requisição',async () => {
+		const resultCreated =  await testServer.post('/cidades').set({Authorization: `Bearer ${accessToken}`}).send({nome:'paulistaToken'});
+		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
+
+		const resDeleted =  await testServer.delete(`/cidades/${resultCreated.body}`);
+		expect(resDeleted.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resDeleted.body).toHaveProperty('errors.default');
+	});
+
 	it('Tentar apagar uma cidade que não existe',async () => {
 		const resDeleted =  await testServer.delete('/cidades/99999').set({Authorization: `Bearer ${accessToken}`});
 		expect(resDeleted.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);

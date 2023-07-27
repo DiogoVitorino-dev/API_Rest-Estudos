@@ -19,7 +19,7 @@ describe('Pessoas - GetById', () => {
 			.send({email:'gettoken@outlook.com', senha:'123456'});
 
 		accessToken = body.accessToken;
-		
+
 		const resPost = await testServer.post('/cidades')
 			.set({Authorization: `Bearer ${accessToken}`}).send({ nome: 'paulista' });
 		bodyTest = {
@@ -38,6 +38,17 @@ describe('Pessoas - GetById', () => {
 			.set({Authorization: `Bearer ${accessToken}`});
 		expect(resGetById.statusCode).toEqual(StatusCodes.OK);
 		expect(resGetById.body).toHaveProperty('nomeCompleto','teste da silva');
+	});
+
+	it('Não deve retorna pessoa sem o token de validação na requisição',async () => {
+		const resultCreated =  await testServer.post('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`})
+			.send({...bodyTest, email:'token@outlook.com'});
+		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
+
+		const resGetById =  await testServer.get(`/pessoas/${resultCreated.body}`);
+		expect(resGetById.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resGetById.body).toHaveProperty('errors.default');
 	});
 
 	it('Tenta retornar um registro que não existe',async () => {

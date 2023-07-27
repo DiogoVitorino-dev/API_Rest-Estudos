@@ -24,6 +24,12 @@ describe('Cidades - GetById', () => {
 		expect(resGetById.body).toHaveProperty('nome');
 	});
 
+	it('Não deve retorna cidade sem o token de validação na requisição',async () => {
+		const resGetById =  await testServer.get('/cidades/1');
+		expect(resGetById.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resGetById.body).toHaveProperty('errors.default');
+	});
+
 	it('Tenta retornar uma cidade que não existe',async () => {
 		const resGetById =  await testServer.get('/cidades/99999').set({Authorization: `Bearer ${accessToken}`});
 		expect(resGetById.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);

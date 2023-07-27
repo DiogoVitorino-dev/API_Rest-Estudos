@@ -49,6 +49,18 @@ describe('Pessoas - UpdateById', () => {
 		expect(resGetById.body).toHaveProperty('nomeCompleto','test');
 	});
 
+	it('Não deve modificar um registro sem o token de validação na requisição',async () => {
+		const resultCreated =  await testServer.post('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`})
+			.send({...bodyTest, email:'token@outlook.com'});
+		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
+
+		const resUpdateById =  await testServer.put(`/pessoas/${resultCreated.body}`)
+			.send({...bodyTest, nomeCompleto: 'test' });
+		expect(resUpdateById.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resUpdateById.body).toHaveProperty('errors.default');
+	});
+
 	it('Tentar modificar um registro que não existe',async () => {
 		const resUpdateById =  await testServer.put('/pessoas/99999')
 			.set({Authorization: `Bearer ${accessToken}`})

@@ -21,6 +21,12 @@ describe('Cidades - Create', () => {
 		expect(typeof resCreate.body).toEqual('number');
 	});
 
+	it('Não deve cria registro sem o token de validação na requisição',async () => {
+		const resCreate =  await testServer.post('/cidades').send({ nome: 'paulista' });
+		expect(resCreate.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resCreate.body).toHaveProperty('errors.default');
+	});
+
 	it('Não deve criar registro sem a propriedade nome',async () => {
 		const resCreate =  await testServer.post('/cidades').set({Authorization: `Bearer ${accessToken}`}).send({ nomeCidade: 'paulita' });
 

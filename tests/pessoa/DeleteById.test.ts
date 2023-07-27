@@ -44,6 +44,16 @@ describe('Pessoas - DeleteById', () => {
 		expect(resGetById.body).not.toHaveProperty('nomeCompleto','teste da silva');
 	});
 
+	it('Não deve apagar um registro sem o token de validação na requisição',async () => {
+		const resultCreated =  await testServer.post('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).send(bodyTest);
+		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
+
+		const resDeleted =  await testServer.delete(`/pessoas/${resultCreated.body}`);
+		expect(resDeleted.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resDeleted.body).toHaveProperty('errors.default');
+	});
+
 	it('Tentar apagar uma registro que não existe',async () => {
 		const resDeleted =  await testServer.delete('/pessoas/99999')
 			.set({Authorization: `Bearer ${accessToken}`});

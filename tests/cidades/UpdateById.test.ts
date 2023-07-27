@@ -26,6 +26,18 @@ describe('Cidades - UpdateById', () => {
 		expect(resGetById.body).toHaveProperty('nome','são paulo');
 	});
 
+	it('Não deve modificar um registro sem o token de validação na requisição',async () => {
+		const resultCreated =  await testServer.post('/cidades')
+			.set({Authorization: `Bearer ${accessToken}`}).send({nome:'paulistaToken'});
+		expect(resultCreated.statusCode).toEqual(StatusCodes.CREATED);
+
+		const resUpdateById =  await testServer.put(`/cidades/${resultCreated.body}`)
+			.send({ nome: 'são paulo' });
+		expect(resUpdateById.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resUpdateById.body).toHaveProperty('errors.default');
+
+	});
+
 	it('Tentar modificar uma cidade que não existe',async () => {
 		const resUpdateById =  await testServer.put('/cidades/99999')
 			.set({Authorization: `Bearer ${accessToken}`}).send({ nome: 'paulista' });

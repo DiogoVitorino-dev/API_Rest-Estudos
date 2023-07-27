@@ -47,15 +47,22 @@ describe('Pessoas - Create', () => {
 		expect(resGetById.body).toHaveProperty('nomeCompleto','teste da silva');
 	});
 
+	it('Não deve cria registro sem o token de validação na requisição',async () => {
+		const resCreate =  await testServer.post('/pessoas')
+			.send({...bodyTest, email:'token@outlook.test'});
+		expect(resCreate.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resCreate.body).toHaveProperty('errors.default');
+	});
+
 	it('Não deve cria registro com email ja cadastrado',async () => {
 		const resCreate =  await testServer.post('/pessoas')
-
-			.set({Authorization: `Bearer ${accessToken}`}).send({...bodyTest, email:'duplicado@test.com'});
+			.set({Authorization: `Bearer ${accessToken}`})
+			.send({...bodyTest, email:'duplicado@test.com'});
 		expect(resCreate.statusCode).toEqual(StatusCodes.CREATED);
 
 		const resCreateDuplicado =  await testServer.post('/pessoas')
-
-			.set({Authorization: `Bearer ${accessToken}`}).send({...bodyTest, email:'duplicado@test.com'});
+			.set({Authorization: `Bearer ${accessToken}`})
+			.send({...bodyTest, email:'duplicado@test.com'});
 		expect(resCreateDuplicado.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
 		expect(resCreateDuplicado.body).toHaveProperty('errors.default');
 	});

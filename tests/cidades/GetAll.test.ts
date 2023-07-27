@@ -31,6 +31,12 @@ describe('Cidades - GetAll', () => {
 		expect(resGetAll.body.length).toBeGreaterThan(0);
 	});
 
+	it('Não deve retorna todos os registros sem o token de validação na requisição',async () => {
+		const resGetAll =  await testServer.get('/cidades');
+		expect(resGetAll.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+		expect(resGetAll.body).toHaveProperty('errors.default');
+	});
+
 	it('Deve retorna apenas 2 registros quando o Query Param limit é definido 2',
 		async () => {
 			const resGetAll = await testServer.get('/cidades')
