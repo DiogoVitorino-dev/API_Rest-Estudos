@@ -21,14 +21,17 @@ export const getAllValidation = validation( getSchema => ({
 
 }));
 
-export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Response) => {	
+export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Response) => {
 	const result = await CidadesProvider.getAll(
 		req.query.page || 1,
 		req.query.limit || 10,
 		req.query.filter || '',
 		Number(req.query.id),
 	);
-	
+
+	console.log('id',req.headers.idUsuario);
+
+
 	const count = await CidadesProvider.count(req.query.filter);
 
 	if (result instanceof Error)
@@ -37,7 +40,7 @@ export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Respons
 				default: result.message
 			}
 		});
-		
+
 	else if (count instanceof Error)
 		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			errors:{
@@ -47,6 +50,6 @@ export const getAll = async (req: Request<{}, {}, {}, IQueryProps>, res: Respons
 
 	res.setHeader('access-control-expose-headers','x-total-count');
 	res.setHeader('x-total-count',count);
-	
+
 	return res.status(StatusCodes.OK).json(result);
 };

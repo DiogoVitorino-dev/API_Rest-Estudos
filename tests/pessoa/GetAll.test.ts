@@ -11,8 +11,18 @@ interface IBodyTest {
 describe('Pessoas - GetAll', () => {
 	let bodyTest:IBodyTest = {};
 
+	let accessToken = '';
 	beforeAll(async () => {
-		const resPost = await testServer.post('/cidades').send({ nome: 'paulista' });
+		await testServer.post('/cadastrar')
+			.send({nome:'test', email:'gettoken@outlook.com', senha:'123456'});
+
+		const {body} = await testServer.post('/entrar')
+			.send({email:'gettoken@outlook.com', senha:'123456'});
+		accessToken = body.accessToken;
+
+		const resPost = await testServer.post('/cidades')
+			.set({Authorization: `Bearer ${accessToken}`}).send({ nome: 'paulista' });
+
 		bodyTest = {
 			nomeCompleto: 'teste da silva',
 			email: 'teste@outlook.test',
@@ -22,34 +32,47 @@ describe('Pessoas - GetAll', () => {
 		for (let count = 1; count <= 5; count++) {
 			// alternador
 			if(count % 2 === 0)
-				await testServer.post('/pessoas').send({
-					...bodyTest,
-					email: `teste${count}@outlook.test`,
-					nomeCompleto:'testPar',
-				});
+				await testServer.post('/pessoas')
+					.set({Authorization: `Bearer ${accessToken}`})
+					.send({
+						...bodyTest,
+						email: `teste${count}@outlook.test`,
+						nomeCompleto:'testPar',
+					});
 
 			else
-				await testServer.post('/pessoas').send({
-					...bodyTest,
-					email: `teste${count}@outlook.test`,
-					nomeCompleto:'testImpar',
-				});
+				await testServer.post('/pessoas')
+					.set({Authorization: `Bearer ${accessToken}`})
+					.send({
+						...bodyTest,
+						email: `teste${count}@outlook.test`,
+						nomeCompleto:'testImpar',
+					});
 		}
 	});
 
 	it('Deve retorna todos os registros',async () => {
-		const resGetAll =  await testServer.get('/pessoas');
+		const resGetAll =  await testServer.get('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`});
 		expect(resGetAll.statusCode).toEqual(StatusCodes.OK);
 		expect(Number(resGetAll.header['x-total-count'])).toBeGreaterThan(0);
 		expect(resGetAll.body.length).toBeGreaterThan(0);
 	});
 
+	it('Não deve retorna todos os registros sem o token de validação na requisição',
+		async () => {
+			const resGetAll =  await testServer.get('/pessoas');
+			expect(resGetAll.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+			expect(resGetAll.body).toHaveProperty('errors.default');
+		});
+
 	it('Deve retorna apenas 2 registros quando o Query Param limit é definido 2',
 		async () => {
-			const resGetAll = await testServer.get('/pessoas').query({
-				page:1,
-				limit:2,
-			});
+			const resGetAll = await testServer.get('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).query({
+					page:1,
+					limit:2,
+				});
 
 			expect(resGetAll.statusCode).toEqual(StatusCodes.OK);
 
@@ -65,10 +88,11 @@ describe('Pessoas - GetAll', () => {
 
 	it('Deve retorna os registros que ultrapassarem o Query Param limit apenas na página seguinte',
 		async () => {
-			const resGetAll = await testServer.get('/pessoas').query({
-				page:2,
-				limit:2,
-			});
+			const resGetAll = await testServer.get('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).query({
+					page:2,
+					limit:2,
+				});
 
 			expect(resGetAll.statusCode).toEqual(StatusCodes.OK);
 
@@ -84,10 +108,11 @@ describe('Pessoas - GetAll', () => {
 
 	it('Deve retorna apenas os registros filtrados pelo Query Param filter',
 		async () => {
-			const resGetAll = await testServer.get('/pessoas').query({
-				page:1,
-				filter:'testI'
-			});
+			const resGetAll = await testServer.get('/pessoas')
+				.set({Authorization: `Bearer ${accessToken}`}).query({
+					page:1,
+					filter:'testI'
+				});
 
 			expect(resGetAll.statusCode).toEqual(StatusCodes.OK);
 			expect(
@@ -101,10 +126,11 @@ describe('Pessoas - GetAll', () => {
 	);
 
 	it('Query params - page,limit devem ser Number',async () => {
-		const resGetAll = await testServer.get('/pessoas').query({
-			page:'test',
-			limit:'test'
-		});
+		const resGetAll = await testServer.get('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).query({
+				page:'test',
+				limit:'test'
+			});
 
 		expect(resGetAll.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resGetAll.body).toHaveProperty('errors.query.page');
@@ -112,10 +138,11 @@ describe('Pessoas - GetAll', () => {
 	});
 
 	it('Query params - page,limit devem ser inteiros',async () => {
-		const resGetAll = await testServer.get('/pessoas').query({
-			page:1.5,
-			limit:25.7
-		});
+		const resGetAll = await testServer.get('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).query({
+				page:1.5,
+				limit:25.7
+			});
 
 		expect(resGetAll.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resGetAll.body).toHaveProperty('errors.query.page');
@@ -123,10 +150,11 @@ describe('Pessoas - GetAll', () => {
 	});
 
 	it('Query params - page,limit devem ser maior que 0',async () => {
-		const resGetAll = await testServer.get('/pessoas').query({
-			page:0,
-			limit:-1,
-		});
+		const resGetAll = await testServer.get('/pessoas')
+			.set({Authorization: `Bearer ${accessToken}`}).query({
+				page:0,
+				limit:-1,
+			});
 
 		expect(resGetAll.statusCode).toEqual(StatusCodes.BAD_REQUEST);
 		expect(resGetAll.body).toHaveProperty('errors.query.page');
