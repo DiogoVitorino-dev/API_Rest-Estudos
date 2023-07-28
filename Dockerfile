@@ -5,6 +5,9 @@ ENV NODE_ENV $NODE_ENV
 ARG JWT_SECRET
 ENV JWT_SECRET $JWT_SECRET
 
+ARG ENABLED_CORS
+ENV ENABLED_CORS $ENABLED_CORS
+
 COPY ./src /src
 COPY ./package.json /package.json
 COPY ./package-lock.json /package-lock.json

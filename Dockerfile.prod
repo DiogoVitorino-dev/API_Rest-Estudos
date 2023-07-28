@@ -20,13 +20,15 @@ ENV DATABASE_NAME $DATABASE_NAME
 ARG DATABASE_PORT
 ENV DATABASE_PORT $DATABASE_PORT
 
+ARG ENABLED_CORS
+ENV ENABLED_CORS $ENABLED_CORS
+
 COPY ./src /src
 COPY ./package.json /package.json
 COPY ./package-lock.json /package-lock.json
 COPY ./tsconfig.json /tsconfig.json
 
 RUN NODE_ENV=$NODE_ENV npm install --include=dev
-RUN npm run preproduction
 RUN npm run knex:migrate
 RUN npm run knex:seed
 CMD ["node","./build/index.js"]
