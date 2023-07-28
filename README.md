@@ -1,5 +1,6 @@
 # API_Rest-Estudos
 Projeto de uma API Rest com Nodejs e Typescript. <br>
+Deploy automatizado com Docker no [Back4App](https://www.back4app.com/) <br>
 Está sendo desenvolvido de acordo com o [Curso de API Rest, Node e Typescript](https://www.youtube.com/playlist?list=PL29TaWXah3iaaXDFPgTHiFMBF6wQahurP) criado pelo [<ins>Lucas Souza Dev<ins>](https://www.youtube.com/@LucasSouzaDev)
 
 ## [App 🌎](https://apirestestudos-diogovf90.b4a.run/)
@@ -21,7 +22,7 @@ Está sendo desenvolvido de acordo com o [Curso de API Rest, Node e Typescript](
  - PUT	--	/pessoas/:id	- Atualiza uma pessoa pelo seu id.
  - DELETE	-- /pessoas/:id	- Apaga a pessoa pelo seu id
 
-#### Logic (Público)
+#### Login (Público)
 
  - POST	--	/entrar			- Permite um usuário existente no sistema gerar um token para acessar o endpoints privados.
  - POST	--	/cadastrar		-	Permite criar um novo usuário.
