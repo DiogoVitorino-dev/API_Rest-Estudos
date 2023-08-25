@@ -20,6 +20,11 @@ export const create = async (usuario: Omit<IUsuario,'id'>):Promise<number | Erro
 		return new Error('Erro ao cadastrar o registro');
 	} catch (error:any) {
 		console.log(error.message);
+		if (
+			error.message.includes('SQLITE_CONSTRAINT: UNIQUE constraint failed: usuario.email')
+		) {
+			return new Error('Email ja cadastrado');
+		}
 		return new Error('Erro ao cadastrar o registro');
 
 

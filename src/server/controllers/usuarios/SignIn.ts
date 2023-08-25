@@ -42,5 +42,5 @@ export const signIn = async (req: Request<{}, {}, IParamProps>, res: Response) =
 			}
 		});
 
-	return res.status(StatusCodes.OK).json({accessToken});
+	return res.status(StatusCodes.OK).json({id:usuario.id,nome:usuario.nome,accessToken});
 };
